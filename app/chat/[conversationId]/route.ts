@@ -12,8 +12,9 @@ const replicate = new Replicate({
 export async function POST(req: Request, { params: { conversationId } }) {
   const data = await req.json()
   console.log('POST', data)
-
-  await createMessage(conversationId, 'assistant', data.output.join(''))
+  if (data?.status === 'succeeded') {
+    await createMessage(conversationId, 'assistant', data.output.join(''))
+  }
   const conversation = await getConversation(conversationId)
 
   return NextResponse.json({ success: true, conversation })
@@ -37,14 +38,14 @@ export async function PUT(req: Request, { params: { conversationId } }) {
 
   await createMessage(conversationId, role, content)
   const conversation = await getConversation(conversationId)
-
+  console.log(process.env.VERCEL_URL)
   await replicate.predictions.create({
     version: vicuna13b,
     input: {
       prompt: conversationToPrompt(conversation),
     },
-    webhook: `https://${process.env.VERCEL_URL}/chat/${conversationId}`,
-    webhook_events_filter: ['completed'],
+    webhook: `${process.env.VERCEL_URL}/chat/${conversationId}`,
+    webhook_events_filter: ['completed'], //'logs', 'output', 'start'],
   })
   return NextResponse.json({ success: true, conversation })
 }
@@ -65,22 +66,28 @@ const createMessage = async (
   return rows[0]
 }
 
+const username = 'USER'
+const assistant = 'ASSISTANT'
+
 const defaultInstructions = [
-  `The following is a conversation between a highly knowledgeable and intelligent AI assistant, called Vana, and a human user, called User. In the following interactions, User and Vana will converse in natural language, and Vana will answer User's questions. Vana was built to be respectful, polite and inclusive. Vana will never decline to answer a question, and always attempts to give an answer that User would be satisfied with. Vana knows a lot, and always tells the truth. The conversation begins.`,
+  `INSTRUCTIONS`,
+  `The following is a conversation between a highly knowledgeable and intelligent AI assistant, called ${assistant} and a human called ${username}. In the following interactions, ${username} and ${assistant} will converse in natural language, and ${assistant} will answer ${username}'s questions. ${assistant} was built to be respectful, polite and inclusive. ${assistant} will never decline to answer a question, and always attempts to give an answer that ${username} would be satisfied with. ${assistant} knows a lot, and always tells the truth. The conversation begins.\n`,
+  `HISTORY`,
 ]
 
 const conversationToPrompt = (
   messages: { role: string; content: string }[]
 ) => {
-  const dialoge = messages.map(({ role, content }) => {
-    const name = role === 'assistant' ? 'Vana' : 'User'
+  const history = messages.map(({ role, content }) => {
+    const name = role === 'assistant' ? assistant : username
     return `${name}: ${content}`
   })
-  const concluding = 'assistant:'
-  return defaultInstructions.concat(...dialoge, concluding).join('\n')
+  const concluding = `${assistant}:`
+
+  return [...defaultInstructions, ...history, concluding].join('\n')
 }
 
-const starterContent = 'What is something you are passionate about?'
+const starterContent = "What's on your mind?"
 
 // sql`
 // CREATE TABLE messages (
