@@ -71,10 +71,10 @@ export default function Home() {
         <div className="mt-10 mb-8 text-center">
           <h1 className="text-4xl m-2 text-black font-medium">GPT-me</h1>
           <h3 className={'text-lg text-stone-600 font-serif font-medium'}>
-            {`By talking to myself, I know I'm talking to an intelligent person.`}
+            {`ABSTRACTION IS A TYPE OF DECADENCE`}
           </h3>
           <h4 className={'text-md font-semibold m-1 text-stone-600 font-serif'}>
-            ROBERT FROST
+            Jenny Holzer
           </h4>
         </div>
         {/* Chat list */}
