@@ -4,8 +4,8 @@ import { Open_Sans } from 'next/font/google'
 const font = Open_Sans({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Replicate',
-  description: '',
+  title: 'Replicate Chat',
+  description: 'Vicuna powered chat demo',
 }
 
 export default function RootLayout({
