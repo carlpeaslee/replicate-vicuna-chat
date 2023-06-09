@@ -43,7 +43,7 @@ export async function PUT(req: Request, { params: { conversationId } }) {
     input: {
       prompt: conversationToPrompt(conversation),
     },
-    webhook: `https://e060-135-180-156-208.ngrok-free.app/chat/${conversationId}`,
+    webhook: `https://${process.env.VERCEL_URL}/chat/${conversationId}`,
     webhook_events_filter: ['completed'],
   })
   return NextResponse.json({ success: true, conversation })
