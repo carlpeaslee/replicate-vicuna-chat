@@ -44,7 +44,7 @@ export async function PUT(req: Request, { params: { conversationId } }) {
     input: {
       prompt: conversationToPrompt(conversation),
     },
-    webhook: `${process.env.VERCEL_URL}/chat/${conversationId}`,
+    webhook: `https://${process.env.VERCEL_URL}/chat/${conversationId}`,
     webhook_events_filter: ['completed'], //'logs', 'output', 'start'],
   })
   return NextResponse.json({ success: true, conversation })
